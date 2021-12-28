@@ -158,6 +158,9 @@ acquireCertificate() {
         return 1
     fi
 
+    logInfo "Register certificate issuer..."
+    "$ACME_BIN" --register-account -m "certIssuer@${TLD}"
+
     logInfo "Issuing certificates..."
     "$ACME_BIN" --issue "${ACME_OPTS[@]}" "${ACME_DOMAIN_ARGS[@]}"
 
@@ -179,8 +182,8 @@ while ! waitForOnline "${ACME_DOMAINS[0]}"; do
 done
 
 if ! lastAcquiredCertFor "production"; then
-    acquireCertificate "staging" || logErrorAndStop "Unable to acquire a staging certificate."
-    waitToSeeStagingCert || logErrorAndStop "Unable to detect certificate change over. Cannot issue a production certificate."
+    # acquireCertificate "staging" || logErrorAndStop "Unable to acquire a staging certificate."
+    # waitToSeeStagingCert || logErrorAndStop "Unable to detect certificate change over. Cannot issue a production certificate."
     acquireCertificate "production" "true" || logErrorAndStop "Unable to acquire a production certificate."
 fi
 
