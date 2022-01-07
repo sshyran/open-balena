@@ -188,21 +188,11 @@ services:
       - "3128"
       - "5432"
       - "6379"
-    networks:
-      default:
-        aliases:
-          - api.${OPENBALENA_HOST_NAME}
-          - registry.${OPENBALENA_HOST_NAME}
-          - vpn.${OPENBALENA_HOST_NAME}
-          - db.${OPENBALENA_HOST_NAME}
-          - s3.${OPENBALENA_HOST_NAME}
-          - redis.${OPENBALENA_HOST_NAME}
-          - tunnel.${OPENBALENA_HOST_NAME}
-    environment:
-      BALENA_HAPROXY_CRT: ${OPENBALENA_ROOT_CRT}
-      BALENA_HAPROXY_KEY: ${OPENBALENA_ROOT_KEY}
-      BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
-      HAPROXY_HOSTNAME: ${OPENBALENA_HOST_NAME}
+    # environment:
+      # BALENA_HAPROXY_CRT: ${OPENBALENA_ROOT_CRT}
+      # BALENA_HAPROXY_KEY: ${OPENBALENA_ROOT_KEY}
+      # BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
+      # HAPROXY_HOSTNAME: ${OPENBALENA_HOST_NAME}
     volumes:
       - certs:/certs:ro
 
@@ -212,9 +202,9 @@ services:
       - certs:/certs
       - cert-provider:/usr/src/app/certs
     environment:
-      ACTIVE: ${OPENBALENA_ACME_CERT_ENABLED}
-      DOMAINS: "api.${OPENBALENA_HOST_NAME},registry.${OPENBALENA_HOST_NAME},s3.${OPENBALENA_HOST_NAME},vpn.${OPENBALENA_HOST_NAME},tunnel.${OPENBALENA_HOST_NAME}"
-      TLD: ${OPENBALENA_HOST_NAME}
+      # ACTIVE: ${OPENBALENA_ACME_CERT_ENABLED}
+      # DOMAINS: "api.${OPENBALENA_HOST_NAME},registry.${OPENBALENA_HOST_NAME},s3.${OPENBALENA_HOST_NAME},vpn.${OPENBALENA_HOST_NAME},tunnel.${OPENBALENA_HOST_NAME}"
+      # TLD: ${OPENBALENA_HOST_NAME}
       OUTPUT_PEM: /certs/open-balena.pem
   
   haproxy-sidecar:
