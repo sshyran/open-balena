@@ -1,0 +1,315 @@
+version: "2.1"
+
+volumes:
+  certs: {}
+  cert-provider: {}
+  db: {}
+  redis: {}
+  registry: {}
+  s3: {}
+
+x-component-cap-add: &component-cap-add
+  cap_add:
+    - SYS_ADMIN
+    - SYS_RESOURCE
+x-component-tmpfs: &component-tmpfs
+  tmpfs:
+    - /run
+    - /sys/fs/cgroup
+x-component-privileged: &component-privileged
+  privileged: true
+
+x-component-env: &component-env
+  CONFD_BACKEND: ENV
+
+x-system-security: &system-security
+  security_opt:
+    - seccomp:unconfined
+
+services:
+  api:
+    <<:
+      [
+      *component-cap-add,
+      *component-tmpfs,
+      *component-privileged
+      ]
+    image: balena/open-balena-api:v0.139.0
+    depends_on:
+      - db
+      - s3
+      - redis
+    environment:
+      <<: *component-env
+      # API_VPN_SERVICE_API_KEY: ${OPENBALENA_API_VPN_SERVICE_API_KEY}
+      # BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
+      # COOKIE_SESSION_SECRET: ${OPENBALENA_COOKIE_SESSION_SECRET}
+      DB_HOST: db
+      DB_PASSWORD: docker
+      DB_PORT: 5432
+      DB_USER: docker
+      # DELTA_HOST: delta.${OPENBALENA_HOST_NAME}
+      # DEVICE_CONFIG_OPENVPN_CA: ${OPENBALENA_VPN_CA_CHAIN}
+      # DEVICE_CONFIG_SSH_AUTHORIZED_KEYS: ${OPENBALENA_SSH_AUTHORIZED_KEYS}
+      # HOST: api.${OPENBALENA_HOST_NAME}
+      # IMAGE_MAKER_URL: img.${OPENBALENA_HOST_NAME}
+      IMAGE_STORAGE_BUCKET: resin-production-img-cloudformation
+      IMAGE_STORAGE_PREFIX: images
+      IMAGE_STORAGE_ENDPOINT: s3.amazonaws.com
+      JSON_WEB_TOKEN_EXPIRY_MINUTES: 10080
+      # JSON_WEB_TOKEN_SECRET: ${OPENBALENA_JWT_SECRET}
+      MIXPANEL_TOKEN: __unused__
+      # PRODUCTION_MODE: "${OPENBALENA_PRODUCTION_MODE}"
+      PUBNUB_PUBLISH_KEY: __unused__
+      PUBNUB_SUBSCRIBE_KEY: __unused__
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # REGISTRY2_HOST: registry.${OPENBALENA_HOST_NAME}
+      # REGISTRY_HOST: registry.${OPENBALENA_HOST_NAME}
+      SENTRY_DSN: ""
+      # TOKEN_AUTH_BUILDER_TOKEN: ${OPENBALENA_TOKEN_AUTH_BUILDER_TOKEN}
+      # TOKEN_AUTH_CERT_ISSUER: api.${OPENBALENA_HOST_NAME}
+      # TOKEN_AUTH_CERT_KEY: ${OPENBALENA_TOKEN_AUTH_KEY}
+      # TOKEN_AUTH_CERT_KID: ${OPENBALENA_TOKEN_AUTH_KID}
+      # TOKEN_AUTH_CERT_PUB: ${OPENBALENA_TOKEN_AUTH_PUB}
+      TOKEN_AUTH_JWT_ALGO: "ES256"
+      # VPN_HOST: vpn.${OPENBALENA_HOST_NAME}
+      VPN_PORT: 443
+      # VPN_SERVICE_API_KEY: ${OPENBALENA_VPN_SERVICE_API_KEY}
+      # SUPERUSER_EMAIL: ${OPENBALENA_SUPERUSER_EMAIL}
+      # SUPERUSER_PASSWORD: ${OPENBALENA_SUPERUSER_PASSWORD}
+
+  registry:
+    <<:
+      [
+      *component-cap-add,
+      *component-tmpfs,
+      *component-privileged
+      ]
+    image: balena/open-balena-registry:v2.16.1
+    depends_on:
+      - s3
+      - redis
+    volumes:
+      - registry:/data
+    environment:
+      <<: *component-env
+      # API_TOKENAUTH_CRT: ${OPENBALENA_TOKEN_AUTH_PUB}
+      # BALENA_REGISTRY2_HOST: registry.${OPENBALENA_HOST_NAME}
+      # BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
+      # BALENA_TOKEN_AUTH_ISSUER: api.${OPENBALENA_HOST_NAME}
+      # BALENA_TOKEN_AUTH_REALM: https://api.${OPENBALENA_HOST_NAME}/auth/v1/token
+      # COMMON_REGION: ${OPENBALENA_S3_REGION}
+      REGISTRY2_CACHE_ENABLED: "false"
+      REGISTRY2_CACHE_ADDR: 127.0.0.1:6379
+      REGISTRY2_CACHE_DB: 0
+      REGISTRY2_CACHE_MAXMEMORY_MB: 1024 # megabytes
+      REGISTRY2_CACHE_MAXMEMORY_POLICY: allkeys-lru
+      # REGISTRY2_S3_REGION_ENDPOINT: ${OPENBALENA_S3_ENDPOINT}
+      # REGISTRY2_S3_BUCKET: ${OPENBALENA_REGISTRY2_S3_BUCKET}
+      # REGISTRY2_S3_KEY: ${OPENBALENA_S3_ACCESS_KEY}
+      # REGISTRY2_S3_SECRET: ${OPENBALENA_S3_SECRET_KEY}
+      # REGISTRY2_SECRETKEY: ${OPENBALENA_REGISTRY_SECRET_KEY}
+      REGISTRY2_STORAGEPATH: /data
+      REGISTRY2_DISABLE_REDIRECT: "false"
+
+  vpn:
+    <<:
+      [
+      *component-cap-add,
+      *component-tmpfs,
+      *component-privileged
+      ]
+    image: balena/open-balena-vpn:v9.17.11
+    depends_on:
+      - api
+    cap_add:
+      - NET_ADMIN
+    environment:
+      <<: *component-env
+      # API_SERVICE_API_KEY: ${OPENBALENA_API_VPN_SERVICE_API_KEY}
+      # BALENA_API_HOST: api.${OPENBALENA_HOST_NAME}
+      # BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
+      BALENA_VPN_PORT: 443
+      # PRODUCTION_MODE: "${OPENBALENA_PRODUCTION_MODE}"
+      RESIN_VPN_GATEWAY: 10.2.0.1
+      SENTRY_DSN: ""
+      VPN_HAPROXY_USEPROXYPROTOCOL: "true"
+      # VPN_OPENVPN_CA_CRT: ${OPENBALENA_VPN_CA}
+      # VPN_OPENVPN_SERVER_CRT: ${OPENBALENA_VPN_SERVER_CRT}
+      # VPN_OPENVPN_SERVER_DH: ${OPENBALENA_VPN_SERVER_DH}
+      # VPN_OPENVPN_SERVER_KEY: ${OPENBALENA_VPN_SERVER_KEY}
+      # VPN_SERVICE_API_KEY: ${OPENBALENA_VPN_SERVICE_API_KEY}
+
+  db:
+    <<: *system-security
+    image: balena/open-balena-db:v4.1.0
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  s3:
+    <<:
+      [
+      *component-cap-add,
+      *component-tmpfs,
+      *component-privileged
+      ]
+    image: balena/open-balena-s3:v2.9.9
+    volumes:
+      - s3:/export
+    environment:
+      <<: *component-env
+      # S3_MINIO_ACCESS_KEY: ${OPENBALENA_S3_ACCESS_KEY}
+      # S3_MINIO_SECRET_KEY: ${OPENBALENA_S3_SECRET_KEY}
+      # BUCKETS: ${OPENBALENA_S3_BUCKETS}
+
+  redis:
+    <<: *system-security
+    image: redis:alpine
+    volumes:
+      - redis:/data
+
+  haproxy:
+    <<: *system-security
+    build: ./src/haproxy
+    depends_on:
+      - api
+      - cert-provider
+      - db
+      - s3
+      - redis
+      - registry
+      - vpn
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "222"
+      - "3128"
+      - "5432"
+      - "6379"
+    networks:
+      default:
+        aliases:
+          - api.${OPENBALENA_HOST_NAME}
+          - registry.${OPENBALENA_HOST_NAME}
+          - vpn.${OPENBALENA_HOST_NAME}
+          - db.${OPENBALENA_HOST_NAME}
+          - s3.${OPENBALENA_HOST_NAME}
+          - redis.${OPENBALENA_HOST_NAME}
+          - tunnel.${OPENBALENA_HOST_NAME}
+    environment:
+      BALENA_HAPROXY_CRT: ${OPENBALENA_ROOT_CRT}
+      BALENA_HAPROXY_KEY: ${OPENBALENA_ROOT_KEY}
+      BALENA_ROOT_CA: ${OPENBALENA_ROOT_CA}
+      HAPROXY_HOSTNAME: ${OPENBALENA_HOST_NAME}
+    volumes:
+      - certs:/certs:ro
+
+  cert-provider:
+    build: ./src/cert-provider
+    volumes:
+      - certs:/certs
+      - cert-provider:/usr/src/app/certs
+    environment:
+      ACTIVE: ${OPENBALENA_ACME_CERT_ENABLED}
+      DOMAINS: "api.${OPENBALENA_HOST_NAME},registry.${OPENBALENA_HOST_NAME},s3.${OPENBALENA_HOST_NAME},vpn.${OPENBALENA_HOST_NAME},tunnel.${OPENBALENA_HOST_NAME}"
+      TLD: ${OPENBALENA_HOST_NAME}
+      OUTPUT_PEM: /certs/open-balena.pem
+  
+  haproxy-sidecar:
+    restart: unless-stopped
+    image: docker
+    depends_on:
+      - haproxy
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - |
+        set -exa
+
+        which curl || apk add curl --no-cache
+        which jq || apk add jq --no-cache
+
+        network="${BALENA_APP_ID}_default"
+
+        for alias in $(echo "${ALIASES}" | sed 's/,/ /g'); do
+            hostname="${alias}.${DNS_TLD}"
+            aliases="--alias ${hostname} ${aliases}"
+        done
+
+        while true; do
+            while [ "$(curl --silent --retry 3 --fail \
+              "${BALENA_SUPERVISOR_ADDRESS}/v1/device?apikey=${BALENA_SUPERVISOR_API_KEY}" \
+              -H "Content-Type:application/json" | jq -r '.update_pending')" = 'true' ]; do
+                sleep "$((RANDOM%1+1))s"
+            done
+            sleep "$((RANDOM%5+5))s"
+
+            while [ "$(docker ps \
+              --filter "name=haproxy_" \
+              --filter "status=running" \
+              --filter "network=${network}" \
+              --format "{{.ID}}")" = '' ]; do
+                sleep "$((RANDOM%1+1))s"
+            done
+
+            haproxy="$(docker ps \
+              --filter "name=haproxy_" \
+              --filter "status=running" \
+              --filter "network=${network}" \
+              --format "{{.ID}}")"
+
+            if ! [ "${restarted}" = "${haproxy}" ]; then
+                docker network disconnect "${network}" "${haproxy}"
+
+                docker network connect ${aliases} "${network}" "${haproxy}"
+
+                docker restart "${haproxy}"
+
+                restarted="${haproxy}"
+            fi
+
+            sleep "$((RANDOM%15+15))s"
+        done
+    
+    environment:
+      # resolved internally as {{service}}.{{tld-without-balena-device-uuid}}
+      ALIASES: api,registry,vpn,db,s3,redis,tunnel
+    labels:
+      io.balena.features.balena-socket: "1"
+      io.balena.features.supervisor-api: "1"
+
+  # 
+  # TODO: Need to switch balena-mdns-publisher on/off depending on TLD contains
+  # .local ending (local network)
+  #
+  # balena-mdns-publisher:
+  #     image: balena/balena-mdns-publisher:${OPENBALENA_MDNS_PUBLISHER_VERSION_TAG}
+  #     <<: 
+  #       [
+  #         *x-component-cap-add,
+  #         *x-component-tmpfs
+  #       ]
+
+  #     network_mode: "host"
+  #     security_opt:
+  #         - apparmor:unconfined
+  #     # balenaOS - Required for host DBus comms. Not required for standalone Linux
+  #     labels:
+  #         io.balena.features.dbus: '1'
+  #         io.balena.features.supervisor-api: '1'
+  #     environment:
+  #         CONFD_BACKEND: ENV
+  #         # The name of the TLD to use. This *must* match certificates used for the rest of
+  #         # the resin backend (eg. that for BALENA_ROOT_CA if present).
+  #         MDNS_TLD: ${OPENBALENA_HOST_NAME}
+  #         # List of subdomains to advertise. This must include all required hosts.
+  #         MDNS_SUBDOMAINS: '["api", "db", "registry", "s3", "tunnel", "vpn"]'
+  #         # The expectation is the DBus socket to use is always at the following location.
+  #         DBUS_SESSION_BUS_ADDRESS: "unix:path=/host/run/dbus/system_bus_socket"
+  #         # Selects the interface used for incoming connections from the wider subnet.
+  #         # For NUCs, this is `eno1`. If running natively, pick the appropriate interface.
+  #         # Alternatively, keep the default commented out to autoselect.
+  #         #INTERFACE: "eno1"
