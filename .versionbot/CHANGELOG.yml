@@ -1,4 +1,16 @@
 - commits:
+    - subject: Move haproxy code to upstream repository
+      hash: 5ad6c32e7d7a08e83aae03aa02ce4abfc83eab08
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: ab77
+      nested: []
+  version: 3.5.0
+  title: "'Move haproxy code to upstream repository'"
+  date: 2022-03-22T14:22:53.406Z
+- commits:
     - subject: "chore(registry): removed data volume"
       hash: 3fed389090e18cb977416cafea8a87c0ed4e2b7f
       body: ""
