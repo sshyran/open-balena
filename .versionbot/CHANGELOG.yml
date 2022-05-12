@@ -1,4 +1,17 @@
 - commits:
+    - subject: Prepping for Landr
+      hash: 6123dad95222ad8121efbec53d5d83c273902843
+      body: |
+        Moving around readme and docs content might affect user workflow.
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: andrew
+      nested: []
+  version: 3.7.0
+  title: "'Prepping for Landr'"
+  date: 2022-05-12T22:38:21.756Z
+- commits:
     - subject: "chore(deps): updated open-balena-db to 5.1.0"
       hash: 84141027a19f201c71aaf20ce3d1a1839d0a1455
       body: |
