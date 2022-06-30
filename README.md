@@ -103,6 +103,10 @@ improvements and new functionality is planned:
 
 ## Differences between openBalena and balenaCloud
 
+Whilst openBalena and balenaCloud share the same core technology, there are some key differences. First, openBalena is self-hosted, whereas balenaCloud is hosted by balena and therefore handles security, maintenance, scaling, and reliability of all the backend services. OpenBalena is also single user, whereas balenaCloud supports multiple users and organizations. OpenBalena also lacks some of the commercial features that define balenaCloud, such as the web-based dashboard and updates with binary container deltas.
+
+The following table contains the main differences between both:
+
 | openBalena                                          | balenaCloud                                                                                                                                                                                                                                                             |
 | -----                                               | ----                                                                                                                                                                                                                                                                    |
 | Device updates using full images                    | Device updates using [delta images](https://www.balena.io/docs/learn/deploy/delta/)                                                                                                                                                                                     |
@@ -145,6 +149,22 @@ OpenBalena is licensed under the terms of AGPL v3. See [LICENSE](LICENSE) for de
 
 ## FAQ
 
-### How is it different from balenaCloud?
-Whilst openBalena and balenaCloud share the same core technology, there are some key differences. First, openBalena is self-hosted, whereas balenaCloud is hosted by balena and therefore handles security, maintenance, scaling, and reliability of all the backend services. OpenBalena is also single user, whereas balenaCloud supports multiple users and organizations. OpenBalena also lacks some of the commercial features that define balenaCloud, such as the web-based dashboard and updates with binary container deltas.
+### How do you ensure continuity of openBalena? Are there security patches on openBalena? 
+openBalena is an open source initiative which is mostly driven by us, but it also gets contributions from the community. We work to keep openBalena as up to date as our bandwidth allows, especially with security patches. That said, we do not have a policy or guarantee of a software release schedule. However, it is in our best interest to keep openBalena updated and patched since we also use it for balenaCloud.
+
+### How do you ensure the “Join” command actually works between open and cloud?
+The join command is not only used for moving from openBalena to balenaCloud, but it is used daily by our developers to move devices from developments and testing instances to production, and vice versa. The join command actually wraps the os-config command, which is the basic tool balena uses for configuring devices.
+
+### Is it “production ready”?
+While we actually have some rather large fleets using openBalena, we as a company consider it still to be in Beta status. We don’t perform regular testing on the platform like we do balenaCloud, and we do not yet have feature-parity between the various services we offer. 
+
+### Can new device-types be added to openBalena?
+Technically “yes”, but in a supported or balena-recommended fashion, “no”. The main reason is that until we regularly test the openBalena platform the way we do balenaCloud, there’s no scalable way for us to provide support for new device-types.
+
+### Are there open-source UI dashboards from the community for openBalena?
+Yes! Here are a few:
+- [open-balena-admin / open-balena-ui](https://github.com/dcaputo-harmoni/open-balena-admin) by user [dcaputo-harmoni](https://github.com/dcaputo-harmoni) who first posted about [here](https://forums.balena.io/t/open-balena-admin-an-admin-interface-for-openbalena/355324) in our Forums :)
+- [open-balena-dashboard](https://github.com/Razikus/open-balena-dashboard) by user [Razikus](https://github.com/Razikus)
+
+
 
