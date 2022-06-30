@@ -1,4 +1,20 @@
 - commits:
+    - subject: "patch: Changes to FAQ"
+      hash: 2671cd164a7d4ad89907e873a3e960b0bb1343a2
+      body: Moved a FAQ to the introduction of oB vs. bC; added a few other FAQs
+      footer: {}
+      author: rmorillo24
+      nested: []
+    - subject: "patch: Added FAQ section"
+      hash: f0c4ce16e798f48f2cae4b2f2d238144c1334a87
+      body: Added FAQ section to be fed with interesting questions from users
+      footer: {}
+      author: rmorillo24
+      nested: []
+  version: 3.6.1
+  title: "'patch: Added FAQ section'"
+  date: 2022-06-30T12:43:09.720Z
+- commits:
     - subject: "chore(deps): updated open-balena-db to 5.1.0"
       hash: 84141027a19f201c71aaf20ce3d1a1839d0a1455
       body: |
