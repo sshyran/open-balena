@@ -1,4 +1,23 @@
 - commits:
+    - subject: openBalena on balenaOS
+      hash: 00876619ec81e0296c9ac2d592216825ac84b2e6
+      body: >
+        * orchestrate openBalena on ephemeral device(s) in AWS with GH Actions
+        workflow
+
+        * uses another balenaVirt project to create a virtual test device
+
+        * adds placeholder openBalena test suite using docker:dind pseudo builder
+
+        * socialized with vanilla dockerd/compose
+      footer:
+        Change-type: major
+        change-type: major
+      author: ab77
+      nested: []
+  version: 4.0.0
+  date: 2022-07-28T14:35:01.657Z
+- commits:
     - subject: "chore(deps): updated open-balena-s3 to 2.13.10"
       hash: ca7696fa183390c51a7a052b8c1c0458959b15e2
       body: |
