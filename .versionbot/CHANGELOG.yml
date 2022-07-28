@@ -1,4 +1,18 @@
 - commits:
+    - subject: "chore(deps): update dependency haproxy to 2.6"
+      hash: 1013efedb09631fd82a4bb3126c84dedc6ef3917
+      body: |
+        Update haproxy to 2.6
+
+        Update haproxy from 1.9 to 2.6
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 3.8.0
+  date: 2022-07-28T11:15:40.327Z
+- commits:
     - subject: "chore(deps): updated open-balena-s3 to 2.13.10"
       hash: ca7696fa183390c51a7a052b8c1c0458959b15e2
       body: |
